@@ -1,0 +1,93 @@
+/* Ultra-Premium SaaS Admin Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-saas: #6366f1;
+    --bg-premium: #f8fafc;
+}
+
+body {
+    font-family: 'Inter', sans-serif !important;
+    background-color: var(--bg-premium) !important;
+}
+
+/* Glassmorphism for Dashboard Cards */
+.unfold-dashboard-metrics-item {
+    background: rgba(255, 255, 255, 0.8) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+    border-radius: 12px !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.unfold-dashboard-metrics-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1) !important;
+}
+
+/* Sidebar Refinements */
+#sidebar {
+    border-right: 1px solid #e2e8f0 !important;
+}
+
+.unfold-sidebar-item {
+    border-radius: 8px !important;
+    margin: 2px 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+.unfold-sidebar-item:hover {
+    background-color: #f1f5f9 !important;
+}
+
+/* Table Enhancements */
+.unfold-table-row:hover {
+    background-color: #f8fafc !important;
+}
+
+.unfold-table-cell {
+    padding: 12px 16px !important;
+    font-size: 0.875rem !important;
+}
+
+/* Status Badges */
+.unfold-badge {
+    text-transform: uppercase !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.025em !important;
+    font-size: 0.75rem !important;
+}
+
+/* Buttons */
+.unfold-button-primary {
+    background-color: var(--primary-saas) !important;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+    border-radius: 6px !important;
+}
+
+/* System Health Pulse */
+.unfold-pulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    cursor: pointer;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: pulse-green 2s infinite;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+@keyframes pulse-green {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Growth Chart Container Fixes */
+#growthChart {
+    max-height: 220px !important;
+}

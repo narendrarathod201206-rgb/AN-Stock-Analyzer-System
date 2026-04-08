@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>StockVision – Stock Screener</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'stock/css/styles.css' %}" />
+    <link rel="stylesheet" href="{% static 'stock/css/advanced.css' %}" />
+</head>
+
+<body>
+    {% include 'stock/_sidebar.html' with active='screener' %}
+    <main class="main-content">
+        {% include 'stock/_topbar.html' %}
+        <div class="ticker-wrapper">
+            <div class="ticker-tape" id="tickerTape"></div>
+        </div>
+        <div class="page-body">
+            <div class="page-header">
+                <h1 class="page-title">Stock Screener</h1>
+                <p class="page-subtitle">Filter NSE stocks by fundamentals & technicals</p>
+            </div>
+
+            <div class="card screener-filters-card">
+                <div class="screener-filters">
+                    <div class="filter-group">
+                        <label>Sector</label>
+                        <select id="fSector">
+                            <option value="">All Sectors</option>
+                            <option>IT</option>
+                            <option>Banking</option>
+                            <option>Energy</option>
+                            <option>Auto</option>
+                            <option>Pharma</option>
+                            <option>FMCG</option>
+                            <option>Infra</option>
+                            <option>Finance</option>
+                            <option>Telecom</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Max P/E Ratio</label>
+                        <input type="number" id="fPE" placeholder="e.g. 30" min="0" />
+                    </div>
+                    <div class="filter-group">
+                        <label>Min Market Cap (Cr)</label>
+                        <input type="number" id="fMcap" placeholder="e.g. 10000" min="0" />
+                    </div>
+                    <div class="filter-group">
+                        <label>Min ROE (%)</label>
+                        <input type="number" id="fROE" placeholder="e.g. 10" min="0" />
+                    </div>
+                    <div class="filter-group">
+                        <label>Change % (Min)</label>
+                        <input type="number" id="fChg" placeholder="e.g. -5" step="0.1" />
+                    </div>
+                    <div class="filter-group">
+                        <label>Max Beta</label>
+                        <input type="number" id="fBeta" placeholder="e.g. 1.5" step="0.1" min="0" />
+                    </div>
+                </div>
+                <div class="screener-filter-actions">
+                    <button class="add-btn" onclick="applyFilters()" id="filterBtn">🔍 Apply Filters</button>
+                    <button class="cancel-btn" onclick="resetFilters()">Reset</button>
+                    <span class="results-count" id="resultsCount"></span>
+                </div>
+            </div>
+
+            <div id="screenerLoading" class="loading-state">
+                <div class="loading-spinner large"></div>
+                <p>Loading market data… (this may take ~30s on first load)</p>
+            </div>
+            <div class="card table-card">
+                <div class="card-header">
+                    <h2 class="card-title">Results</h2>
+                    <div class="sort-info" id="sortInfo">Click columns to sort</div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="stock-table" id="screenerTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('symbol')">Symbol ↕</th>
+                                <th onclick="sortTable('name')">Company ↕</th>
+                                <th onclick="sortTable('sector')">Sector ↕</th>
+                                <th onclick="sortTable('price')">Price ↕</th>
+                                <th onclick="sortTable('pct_change')">Change % ↕</th>
+                                <th onclick="sortTable('market_cap')">Mkt Cap ↕</th>
+                                <th onclick="sortTable('pe_ratio')">P/E ↕</th>
+                                <th onclick="sortTable('roe')">ROE % ↕</th>
+                                <th onclick="sortTable('beta')">Beta ↕</th>
+                                <th onclick="sortTable('from_52h_pct')">vs 52W High ↕</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="screenerBody">
+                            <tr>
+                                <td colspan="11" class="table-loading">Loading…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% include 'stock/_footer.html' %}
+    </main>
+    <script src="{% static 'stock/js/app.js' %}"></script>
+    <script src="{% static 'stock/js/screener.js' %}"></script>
+</body>
+
+</html>

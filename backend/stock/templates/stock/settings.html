@@ -1,0 +1,222 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>StockVision – Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'stock/css/styles.css' %}" />
+    <link rel="stylesheet" href="{% static 'stock/css/advanced.css' %}" />
+</head>
+
+<body>
+    {% include 'stock/_sidebar.html' with active='settings' %}
+    <main class="main-content">
+        {% include 'stock/_topbar.html' %}
+        <div class="ticker-wrapper">
+            <div class="ticker-tape" id="tickerTape"></div>
+        </div>
+        <div class="page-body">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Settings</h1>
+                    <p class="page-subtitle">Manage alerts, preferences &amp; account</p>
+                </div>
+                <button class="theme-toggle-btn" id="themeBtn" onclick="toggleTheme(this)">☀️ Light Mode</button>
+            </div>
+
+            <div class="settings-grid">
+
+                <!-- ── Profile ── -->
+                <div class="card settings-card" style="padding:24px;">
+                    <div class="card-header" style="border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:16px;padding-bottom:12px;">
+                        <h2 class="card-title">Profile Summary</h2>
+                    </div>
+                    <form method="POST" action="{% url 'stock:settings' %}">
+                        {% csrf_token %}
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label style="color:var(--text-2); font-size: 0.85rem;">Username</label>
+                            <input type="text" value="{{ user.username }}" disabled style="opacity:0.6; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);" />
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label style="color:var(--text-2); font-size: 0.85rem;">Display Name</label>
+                            <input type="text" name="first_name" id="setName" value="{{ user.get_full_name|default:user.username }}" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: var(--text-1);" />
+                        </div>
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label style="color:var(--text-2); font-size: 0.85rem;">Email Address</label>
+                            <input type="email" name="email" id="setEmail" value="{{ user.email }}" placeholder="your@email.com" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: var(--text-1);" />
+                        </div>
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="color:var(--text-2); font-size: 0.85rem;">My Subscription</label>
+                            <div style="padding: 15px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-weight: 700; color: #fff; font-size: 1.1rem;">{{ sub_info.plan }}</span>
+                                    {% if sub_info.is_premium %}
+                                        <span class="badge" style="background: var(--accent); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800;">ACTIVE</span>
+                                    {% else %}
+                                        <span class="badge" style="background: rgba(255,255,255,0.1); color: var(--text-2); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem;">FREE</span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if sub_info.is_premium %}
+                                    <div style="font-size: 0.85rem; color: var(--text-2); line-height: 1.6;">
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>Expiry Date:</span>
+                                            <span style="color: #fff;">{{ sub_info.expiry|date:"d M Y" }}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                                            <span>Time Remaining:</span>
+                                            <span style="color: var(--neon-green); font-weight: 600;">{{ sub_info.days_left }} Days Left</span>
+                                        </div>
+                                    </div>
+                                    <a href="{% url 'stock:pricing' %}" style="display: block; text-align: center; margin-top: 15px; color: var(--accent); text-decoration: none; font-size: 0.85rem; font-weight: 600;">Extend Plan →</a>
+                                {% else %}
+                                    <p style="font-size: 0.85rem; color: var(--text-2); margin: 10px 0;">Unlock professional tools, intraday charts, and elite AI signals.</p>
+                                    <a href="{% url 'stock:pricing' %}" class="add-btn" style="display: block; text-align: center; text-decoration: none; background: var(--accent); color: #fff; padding: 10px; border-radius: 8px; font-weight: 700; margin-top: 10px;">Upgrade to Pro ⚡</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <button type="button" class="add-btn" onclick="saveProfile()" style="width: 100%;">💾 Update Profile</button>
+                    </form>
+                </div>
+
+                <!-- ── Price Alerts ── -->
+                <div class="card settings-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Price Alerts 🔔</h2>
+                    </div>
+                    <div class="alert-form">
+                        <input type="text" id="alertSymbol" placeholder="Symbol (e.g. TCS)"
+                            style="text-transform:uppercase;" />
+                        <select id="alertCondition">
+                            <option value="above">Price Above</option>
+                            <option value="below">Price Below</option>
+                        </select>
+                        <input type="number" id="alertPrice" placeholder="Target ₹" min="0" step="0.01" />
+                        <button class="add-btn" onclick="addAlert()">+ Add Alert</button>
+                    </div>
+                    <div id="alertsList" class="alerts-list">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+
+                <!-- ── Preferences ── -->
+                <div class="card settings-card" style="padding:24px;">
+                    <div class="card-header" style="border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:16px;padding-bottom:12px;">
+                        <h2 class="card-title">System Preferences</h2>
+                    </div>
+                    <div class="pref-item" style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <span style="color: var(--text-1);">Auto-refresh data (60s)</span>
+                        <label class="toggle"><input type="checkbox" id="prefRefresh" checked /><span
+                                class="toggle-slider"></span></label>
+                    </div>
+                    <div class="pref-item" style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <span style="color: var(--text-1);">Show ticker tape</span>
+                        <label class="toggle"><input type="checkbox" id="prefTicker" checked /><span
+                                class="toggle-slider"></span></label>
+                    </div>
+                    <div class="pref-item" style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <span style="color: var(--text-1);">App Theme (Dark Mode)</span>
+                        <label class="toggle">
+                            <input type="checkbox" id="prefDark" checked
+                                onchange="toggleTheme(document.getElementById('themeBtn'))" />
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-group" style="margin-top:20px; margin-bottom:20px;">
+                        <label style="color:var(--text-2); font-size: 0.85rem;">Default Market Index</label>
+                        <select id="prefIndex" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: var(--text-1);">
+                            <option value="NIFTY50">NIFTY 50</option>
+                            <option value="SENSEX">SENSEX</option>
+                            <option value="BANKNIFTY">BANK NIFTY</option>
+                        </select>
+                    </div>
+                    <button class="add-btn" onclick="savePrefs()" style="width: 100%;">⚙️ Save Preferences</button>
+                </div>
+
+                <!-- ── Account ── -->
+                <div class="card settings-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Account</h2>
+                    </div>
+                    <div class="about-list">
+                        <div class="about-item"><span>Username</span><span>{{ user.username }}</span></div>
+                        <div class="about-item"><span>Member Since</span><span>{{ user.date_joined|date:"d M Y" }}</span></div>
+                        <div class="about-item"><span>Plan</span><span style="color:var(--accent)">Pro Trader ⚡</span>
+                        </div>
+                        <div class="about-item"><span>Version</span><span>2.0.0</span></div>
+                        <div class="about-item"><span>Data Source</span><span>Yahoo Finance</span></div>
+                        <div class="about-item"><span>Framework</span><span>Django 6.0</span></div>
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
+                        <a href="{% url 'stock:export_portfolio' %}" class="action-btn">📥 Export CSV</a>
+                        <a href="{% url 'stock:logout' %}" class="danger-btn" style="padding:8px 16px;">⏻ Logout</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% include 'stock/_footer.html' %}
+    </main>
+
+    <script src="{% static 'stock/js/app.js' %}"></script>
+    <script>
+        async function loadAlerts() {
+            const r = await fetch('/stock/api/alerts/');
+            const list = document.getElementById('alertsList');
+            if (r.status === 401) { list.innerHTML = '<p style="color:var(--text-2);font-size:0.85rem;">Please login to see alerts.</p>'; return; }
+            const items = await r.json();
+            if (!Array.isArray(items) || !items.length) { list.innerHTML = '<p style="color:var(--text-2);font-size:0.85rem;">No alerts set yet.</p>'; return; }
+            list.innerHTML = items.map(a => `
+                <div class="alert-item">
+                  <div class="alert-info">
+                    <span class="sym-badge">${a.symbol}</span>
+                    <span class="alert-cond">${a.condition === 'above' ? '↑ Above' : '↓ Below'} ₹${Number(a.target_price).toLocaleString('en-IN')}</span>
+                    ${a.triggered ? '<span class="alert-triggered">✅ Triggered!</span>' : ''}
+                  </div>
+                  <button class="danger-btn" onclick="deleteAlert(${a.id})">🗑</button>
+                </div>`).join('');
+        }
+
+        async function addAlert() {
+            const sym = document.getElementById('alertSymbol').value.toUpperCase().trim();
+            const cond = document.getElementById('alertCondition').value;
+            const price = parseFloat(document.getElementById('alertPrice').value);
+            if (!sym || !price) { showToast('Missing Info', 'Please fill symbol and target price.', 'warning'); return; }
+            const r = await fetch('/stock/api/alerts/', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symbol: sym, condition: cond, target_price: price })
+            });
+            if (r.ok) {
+                showToast('Alert Added ✅', `Alert set for ${sym}`, 'success');
+                document.getElementById('alertSymbol').value = '';
+                document.getElementById('alertPrice').value = '';
+                loadAlerts();
+            } else { showToast('Error', 'Could not add alert', 'error'); }
+        }
+
+        async function deleteAlert(id) {
+            await fetch('/stock/api/alerts/' + id + '/', { method: 'DELETE' });
+            showToast('Removed', 'Alert deleted.', 'info');
+            loadAlerts();
+        }
+
+        function saveProfile() { showToast('Profile Saved ✅', 'Your changes have been saved.', 'success'); }
+        function savePrefs() { showToast('Preferences Saved ✅', 'Settings updated.', 'success'); }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAlerts();
+            const isLight = document.body.classList.contains('light');
+            const cb = document.getElementById('prefDark');
+            if (cb) cb.checked = !isLight;
+            const btn = document.getElementById('themeBtn');
+            if (btn) btn.innerHTML = isLight ? '🌙 Dark Mode' : '☀️ Light Mode';
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+{% load static %}
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <div class="footer-logo">StockVision</div>
+            <p style="color: var(--text-2); line-height: 1.6;">
+                Empowering traders with real-time insights and advanced analytics. Experience the future of stock market monitoring.
+            </p>
+            <div class="footer-social">
+                <a href="#" class="social-icon">𝕏</a>
+                <a href="#" class="social-icon">📷</a>
+                <a href="#" class="social-icon">💼</a>
+                <a href="#" class="social-icon">🐙</a>
+            </div>
+        </div>
+
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{% url 'stock:dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'stock:watchlist' %}">Watchlist</a></li>
+                <li><a href="{% url 'stock:portfolio' %}">Portfolio</a></li>
+                <li><a href="{% url 'stock:news' %}">Market News</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-links">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="#">Help Center</a></li>
+                <li><a href="#">API Documentation</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Live Market Clock</h4>
+            <div class="footer-clock-v2">
+                <span id="footerTime">00:00:00</span>
+            </div>
+            <p style="color: var(--text-2); font-size: 0.8rem; margin-top: 10px;">
+                Time is relative. Trading is absolute.
+            </p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2026 StockVision AI. All Rights Reserved. Built with ❤️ for Traders.</p>
+    </div>
+</footer>

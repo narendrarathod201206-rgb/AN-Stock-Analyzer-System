@@ -1,0 +1,233 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing & Plans – StockVision</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'stock/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'stock/css/advanced.css' %}">
+    <style>
+        .pricing-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 24px !important; /* Base padding requested by user */
+        }
+        @media (max-width: 768px) {
+            .pricing-container { margin: 20px auto; padding: 15px; }
+            .pricing-header h1 { font-size: 2.2rem; }
+            .pricing-header p { font-size: 1.1rem; margin-bottom: 30px; }
+            .pricing-grid { gap: 20px; grid-template-columns: 1fr; }
+            .pricing-card { padding: 30px 20px; border-radius: 24px; }
+        }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+            width: 100%;
+        }
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        .pricing-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top right, rgba(108, 99, 255, 0.1), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .pricing-card:hover {
+            transform: translateY(-20px);
+            border-color: rgba(108, 99, 255, 0.5);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 30px rgba(108, 99, 255, 0.1);
+        }
+        .pricing-card:hover::before { opacity: 1; }
+
+        .pricing-card.popular, .pricing-card.elite-highlight {
+            border: 2px solid var(--accent);
+            background: rgba(108, 99, 255, 0.03);
+            box-shadow: 0 0 50px rgba(108, 99, 255, 0.2);
+        }
+        .badge-popular, .badge-elite {
+            position: absolute;
+            top: 25px;
+            right: -45px;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 45px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            transform: rotate(45deg);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+            z-index: 5;
+        }
+        .badge-elite {
+            background: #FFD700; /* Gold for Elite */
+            color: #000;
+        }
+        .plan-icon {
+            font-size: 3rem;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+        }
+        .plan-name {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+        .plan-price {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 35px;
+            color: #fff;
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+        .plan-price span {
+            font-size: 1.1rem;
+            color: var(--text-2);
+            font-weight: 500;
+        }
+        .plan-features {
+            list-style: none;
+            text-align: left;
+            width: 100%;
+            margin-bottom: 50px;
+            flex-grow: 1;
+        }
+        .plan-features li {
+            margin-bottom: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05rem;
+        }
+        .plan-features li i {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+        .plan-features li.disabled {
+            opacity: 0.35;
+            text-decoration: line-through;
+        }
+        .btn-subscribe {
+            width: 100%;
+            min-height: 60px; /* Reliable click area */
+            padding: 15px 25px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10;
+        }
+        .pricing-card.popular .btn-subscribe {
+            background: var(--accent);
+            border: none;
+            box-shadow: 0 10px 25px rgba(108, 99, 255, 0.3);
+        }
+        .btn-subscribe:hover {
+            transform: scale(1.05);
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 15px 30px rgba(108, 99, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    {% include 'stock/_sidebar.html' with active='pricing' %}
+    
+    <main class="main-content">
+        <div class="pricing-container">
+            <header class="pricing-header">
+                <h1>Premium Trading Power</h1>
+                <p>Unlock professional-grade tools, real-time analytics, and elite market signals.</p>
+            </header>
+
+            <div class="pricing-grid">
+                <!-- Free Plan -->
+                <div class="pricing-card">
+                    <div class="plan-icon">🌱</div>
+                    <div class="plan-name">Starter</div>
+                    <div class="plan-price">₹0<span>/mo</span></div>
+                    <p style="color: var(--text-2); font-size: 0.85rem; margin-top: -30px; margin-bottom: 20px;">1 Month Free</p>
+                    <ul class="plan-features">
+                        <li><span>✓</span> 5 Watchlist items</li>
+                        <li><span>✓</span> Daily market overview</li>
+                        <li><span>✓</span> 5 News articles / day</li>
+                        <li class="disabled"><span>✕</span> Intraday technical charts</li>
+                        <li class="disabled"><span>✕</span> Advanced indicators</li>
+                        <li class="disabled"><span>✕</span> Real-time alerts</li>
+                    </ul>
+                    <a href="#" class="btn-subscribe">Current Plan</a>
+                </div>
+
+                <!-- Pro Plan -->
+                <div class="pricing-card popular">
+                    <div class="badge-popular">MOST POPULAR</div>
+                    <div class="plan-icon">🚀</div>
+                    <div class="plan-name">Pro Trader</div>
+                    <div class="plan-price">₹199<span>/month</span></div>
+                    <ul class="plan-features">
+                        <li><span>✓</span> Unlimited Watchlist</li>
+                        <li><span>✓</span> Advanced Intraday charts</li>
+                        <li><span>✓</span> <b>Full Technical Indicators</b></li>
+                        <li><span>✓</span> RSI, MACD & Bollinger Bands</li>
+                        <li><span>✓</span> Unlimited news & research</li>
+                        <li class="disabled"><span>✕</span> Elite Buy/Sell Signals</li>
+                    </ul>
+                    <a href="{% url 'stock:checkout' plan='pro' %}" class="btn-subscribe">Get Pro Access <span>→</span></a>
+                </div>
+
+                <!-- Elite Plan -->
+                <div class="pricing-card elite-highlight">
+                    <div class="badge-elite">FEATURED</div>
+                    <div class="plan-icon">👑</div>
+                    <div class="plan-name">Elite</div>
+                    <div class="plan-price">₹499<span>/month</span></div>
+                    <ul class="plan-features">
+                        <li><span>✓</span> Everything in Pro</li>
+                        <li><span>✓</span> <b>AI Buy/Sell Signals</b></li>
+                        <li><span>✓</span> Entry & Exit Recommendations</li>
+                        <li><span>✓</span> Custom sector heatmaps</li>
+                        <li><span>✓</span> Priority 24/7 Support</li>
+                        <li><span>✓</span> Early Feature Access</li>
+                    </ul>
+                    <a href="{% url 'stock:checkout' plan='elite' %}" class="btn-subscribe">Get Elite Access <span>→</span></a>
+                </div>
+            </div>
+        </div>
+        {% include 'stock/_footer.html' %}
+    </main>
+    <script src="{% static 'stock/js/app.js' %}"></script>
+</body>
+</html>

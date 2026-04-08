@@ -1,0 +1,126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>StockVision – Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'stock/css/styles.css' %}" />
+    <link rel="stylesheet" href="{% static 'stock/css/advanced.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    {% include 'stock/_sidebar.html' with active='analytics' %}
+    <main class="main-content">
+        {% include 'stock/_topbar.html' %}
+        <div class="ticker-wrapper">
+            <div class="ticker-tape" id="tickerTape"></div>
+        </div>
+        <div class="page-body">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Technical Analytics</h1>
+                    <p class="page-subtitle">RSI · MACD · Bollinger Bands · SMA signals</p>
+                </div>
+                <span class="signal-badge large" id="signalBadge">—</span>
+            </div>
+
+            <!-- Controls -->
+            <div class="analytics-controls card" style="padding:16px 20px;">
+                <div class="analytics-ctrl-row">
+                    <div class="form-group inline">
+                        <label>Symbol</label>
+                        <input type="text" id="analyticsSymbol" value="RELIANCE" placeholder="NSE Symbol"
+                            style="text-transform:uppercase;width:160px;" />
+                    </div>
+                    <div class="form-group inline">
+                        <label>Period</label>
+                        <select id="analyticsPeriod">
+                            <option value="1mo">1 Month</option>
+                            <option value="3mo" selected>3 Months</option>
+                            <option value="6mo">6 Months</option>
+                            <option value="1y">1 Year</option>
+                        </select>
+                    </div>
+                    <button class="add-btn" onclick="loadAnalytics()">🔍 Analyse</button>
+                </div>
+
+                <div class="signal-summary" id="signalSummary" style="display:none;">
+                    <div class="signal-detail">
+                        <span class="signal-label">RSI</span><span id="rsiVal">—</span>
+                    </div>
+                    <div class="signal-detail">
+                        <span class="signal-label">MACD</span><span id="macdVal">—</span>
+                    </div>
+                    <div class="signal-detail">
+                        <span class="signal-label">SMA 20</span><span id="sma20Val">—</span>
+                    </div>
+                    <div class="signal-detail">
+                        <span class="signal-label">SMA 50</span><span id="sma50Val">—</span>
+                    </div>
+                    <div class="signal-detail">
+                        <span class="signal-label">BB Upper</span><span id="bbUpperVal">—</span>
+                    </div>
+                    <div class="signal-detail">
+                        <span class="signal-label">BB Lower</span><span id="bbLowerVal">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price + Bollinger Chart -->
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h2 class="card-title" id="analyticsTitle">Price & Bollinger Bands</h2>
+                    <div class="chart-meta">
+                        <span class="chart-price" id="analyticsCMP">—</span>
+                        <span class="chart-change" id="analyticsChange">—</span>
+                    </div>
+                </div>
+                <div style="position:relative;height:320px;"><canvas id="priceChart"></canvas></div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- RSI Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">RSI (14)</h2>
+                        <div class="indicator-levels">
+                            <span class="level-badge overbought">Overbought &gt;70</span>
+                            <span class="level-badge oversold">Oversold &lt;30</span>
+                        </div>
+                    </div>
+                    <div style="position:relative;height:180px;"><canvas id="rsiChart"></canvas></div>
+                </div>
+
+                <!-- MACD Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">MACD (12, 26, 9)</h2>
+                        <div class="indicator-levels">
+                            <span class="level-badge positive-badge" id="macdSignalBadge">—</span>
+                        </div>
+                    </div>
+                    <div style="position:relative;height:180px;"><canvas id="macdChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Volume Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Volume</h2>
+                </div>
+                <div style="position:relative;height:140px;"><canvas id="analyticsVolChart"></canvas></div>
+            </div>
+            {% include 'stock/_footer.html' %}
+        </div>
+    </main>
+    <script src="{% static 'stock/js/app.js' %}"></script>
+    <script src="{% static 'stock/js/analytics.js' %}"></script>
+</body>
+
+</html>

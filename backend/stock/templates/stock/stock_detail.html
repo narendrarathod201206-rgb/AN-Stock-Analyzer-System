@@ -1,0 +1,365 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>StockVision – {{ symbol }} Detail</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'stock/css/styles.css' %}?v=1.1" />
+    <link rel="stylesheet" href="{% static 'stock/css/advanced.css' %}?v=1.1" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    {% include 'stock/_sidebar.html' with active='' %}
+    <main class="main-content">
+        {% include 'stock/_topbar.html' %}
+        <div class="ticker-wrapper">
+            <div class="ticker-tape" id="tickerTape"></div>
+        </div>
+        <div class="page-body">
+
+            <div class="stock-detail-header">
+                <div class="stock-detail-title-row">
+                    <div class="sd-identity">
+                        <div class="sd-top-meta">
+                            <span class="sd-sector" id="sdSector"></span>
+                            <span class="sd-status-dot green" id="sdMarketStatus"></span>
+                        </div>
+                        <h1 class="page-title" id="sdName">{{ symbol }}</h1>
+                        <div class="sd-badges">
+                            <span class="sym-badge large">{{ symbol }}</span>
+                            <span class="signal-badge" id="sdSignal"></span>
+                        </div>
+                    </div>
+                    <div class="sd-price-block">
+                        <div class="sd-price" id="sdPrice">—</div>
+                        <div class="sd-change" id="sdChange">—</div>
+                    </div>
+                </div>
+                <div class="sd-actions-premium">
+                    <button class="action-btn-p accent" onclick="openAddModalDirect()">🚀 Add to Portfolio</button>
+                    <button class="action-btn-p secondary" onclick="addToWatchlistDirect()">⭐ Watchlist</button>
+                    <a href="{% url 'stock:analytics' %}?sym={{ symbol }}" class="action-btn-p outline">🔍 Deep Analysis</a>
+                </div>
+            </div>
+
+            <!-- ANALYTICS DASHBOARD ROW -->
+            <div class="dashboard-grid-2">
+                <!-- CHART CARD -->
+                <div class="card chart-card-p">
+                    <div class="card-header">
+                        <h2 class="card-title">Live Price Action</h2>
+                        <div class="timeframe-btns">
+                            <button class="tf-btn active" onclick="loadSDChart('1mo','1d',this)">1M</button>
+                            <button class="tf-btn" onclick="loadSDChart('3mo','1d',this)">3M</button>
+                            <button class="tf-btn" onclick="loadSDChart('1y','1wk',this)">1Y</button>
+                        </div>
+                    </div>
+                    <div style="position:relative;height:350px;"><canvas id="sdPriceChart"></canvas></div>
+                </div>
+
+                <!-- ANALYTICS SIDEBAR -->
+                <div class="sd-sidebar">
+                    <!-- GAUGE CARD -->
+                    <div class="card gauge-card">
+                        <div class="card-header">
+                            <h2 class="card-title">AI Signal Strength</h2>
+                        </div>
+                        <div class="gauge-container">
+                            <div class="gauge">
+                                <div class="gauge-body">
+                                    <div class="gauge-fill" id="sdGaugeFill"></div>
+                                    <div class="gauge-cover"></div>
+                                </div>
+                                <div class="gauge-needle" id="sdGaugeNeedle"></div>
+                            </div>
+                            <div class="gauge-value" id="sdGaugeText">NEUTRAL</div>
+                        </div>
+                        <div class="gauge-details">
+                            <span id="sdGaugeScore">Score: 50.0</span>
+                        </div>
+                    </div>
+
+                    <!-- 52W RANGE CARD -->
+                    <div class="card range-card">
+                        <div class="card-header">
+                            <h2 class="card-title">52W Range</h2>
+                        </div>
+                        <div class="range-slider-container">
+                            <div class="range-min" id="sd52wLow">₹0</div>
+                            <div class="range-slider-track">
+                                <div class="range-slider-thumb" id="sd52wThumb"></div>
+                            </div>
+                            <div class="range-max" id="sd52wHigh">₹0</div>
+                        </div>
+                        <p class="range-current-label">Current: <span id="sdRangeCurrent">₹0</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KEY STATS -->
+            <div class="card stats-card-p">
+                <div class="card-header">
+                    <h2 class="card-title">Fundamental Data</h2>
+                </div>
+                <div class="stats-detail-grid-p" id="statsDetailGrid">
+                    <div class="shimmer-item"></div>
+                    <div class="shimmer-item"></div>
+                    <div class="shimmer-item"></div>
+                    <div class="shimmer-item"></div>
+                </div>
+            </div>
+
+            <!-- INDICATOR SIGNALS -->
+            <div class="dashboard-grid-3">
+                <div class="card signal-card" id="rsiSignalCard">
+                    <div class="signal-icon">📉</div>
+                    <div class="signal-name">RSI (14)</div>
+                    <div class="signal-val" id="sdRsi">—</div>
+                    <div class="signal-label" id="sdRsiLabel">—</div>
+                </div>
+                <div class="card signal-card" id="macdSignalCard">
+                    <div class="signal-icon">📊</div>
+                    <div class="signal-name">MACD</div>
+                    <div class="signal-val" id="sdMacd">—</div>
+                    <div class="signal-label" id="sdMacdLabel">—</div>
+                </div>
+                <div class="card signal-card" id="smaSignalCard">
+                    <div class="signal-icon">📈</div>
+                    <div class="signal-name">Price vs SMA50</div>
+                    <div class="signal-val" id="sdSma">—</div>
+                    <div class="signal-label" id="sdSmaLabel">—</div>
+                </div>
+            </div>
+        </div>
+        {% include 'stock/_footer.html' %}
+    </main>
+
+    <!-- ADD HOLDING MODAL (QUICK) -->
+    <div class="modal-overlay" id="sdModalOverlay" onclick="closeSDModal()"></div>
+    <div class="modal" id="sdAddModal">
+        <div class="modal-header">
+            <h3>Add to Portfolio</h3>
+            <button class="close-btn" onclick="closeSDModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Symbol</label>
+                <input type="text" id="sdHoldingSymbol" value="{{ symbol }}" readonly style="background:rgba(255,255,255,0.05); color:var(--text-2);" />
+            </div>
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" id="sdHoldingQty" placeholder="e.g. 10" min="1" />
+            </div>
+            <div class="form-group">
+                <label>Average Buy Price (₹)</label>
+                <input type="number" id="sdHoldingAvg" placeholder="e.g. 2500" min="1" step="0.01" />
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel-btn" onclick="closeSDModal()">Cancel</button>
+            <button class="add-btn" onclick="submitSDHolding()" id="sdAddBtn">Add to Portfolio</button>
+        </div>
+    </div>
+
+    <script src="{% static 'stock/js/app.js' %}"></script>
+    <script>
+        const SD_SYMBOL = '{{ symbol }}';
+        let sdChartInstance = null;
+
+        async function loadStockDetail() {
+            try {
+                const [quoteRes, analysisRes] = await Promise.all([
+                    fetch('/stock/api/quote/' + SD_SYMBOL + '/'),
+                    fetch('/stock/api/analysis/' + SD_SYMBOL + '/')
+                ]);
+                const q = await quoteRes.json();
+                const a = await analysisRes.json();
+
+                document.getElementById('sdName').textContent = q.name || SD_SYMBOL;
+                document.getElementById('sdSector').textContent = q.sector || 'N/A';
+                document.getElementById('sdPrice').textContent = '₹' + (q.price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+                
+                const chg = q.pct_change || 0;
+                const chgEl = document.getElementById('sdChange');
+                chgEl.textContent = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+                chgEl.className = 'sd-change ' + (chg >= 0 ? 'positive' : 'negative');
+                
+                // Market Status
+                const statusDot = document.getElementById('sdMarketStatus');
+                const isClosed = document.body.classList.contains('market-closed');
+                statusDot.className = 'sd-status-dot ' + (isClosed ? 'red' : 'green');
+
+                const sig = a.signal || 'HOLD';
+                const sb = document.getElementById('sdSignal');
+                
+                if (sig === 'LOCKED') {
+                    sb.innerHTML = '🔒 Elite Only';
+                    sb.className = 'signal-badge locked';
+                } else {
+                    sb.textContent = sig + ' SIGNAL';
+                    sb.className = 'signal-badge ' + sig.toLowerCase();
+                }
+
+                // Stats grid
+                const g = document.getElementById('statsDetailGrid');
+                const fmt = v => v ? v.toLocaleString('en-IN', { maximumFractionDigits: 2 }) : '—';
+                const fmtCr = v => v ? '₹' + (v / 1e7).toFixed(2) + ' Cr' : '—';
+                g.innerHTML = [
+                    ['Open Price', '₹' + fmt(q.open)], ['Day High', '₹' + fmt(q.high)],
+                    ['Day Low', '₹' + fmt(q.low)], ['Prev Close', '₹' + fmt(q.prev_close)],
+                    ['Market Cap', fmtCr(q.market_cap)], ['Volume', fmt(q.volume)],
+                    ['P/E Ratio', fmt(q.pe_ratio)], ['Div Yield', q.div_yield ? (q.div_yield * 100).toFixed(2) + '%' : '—'],
+                ].map(([l, v]) => `<div class="stat-item-p"><div class="stat-label">${l}</div><div class="stat-value">${v}</div></div>`).join('');
+
+                // 52W RANGE SLIDER
+                update52WRange(q.week52_low, q.week52_high, q.price);
+
+                // GAUGE METER (Score 0-100)
+                const score = a.score || 50;
+                updateGauge(score);
+
+                // Gating Indicators for the small cards at the bottom
+                const hasInd = a.has_indicators;
+                const ind = a.indicators || {};
+                
+                if (!hasInd) {
+                    document.querySelectorAll('.signal-card').forEach(c => {
+                        c.innerHTML = '<div style="filter:blur(3px); opacity:0.5;">' + c.innerHTML + '</div><div class="lock-overlay" onclick="window.location=\'/stock/pricing/\'">🔒 Unlock Elite Analytics</div>';
+                    });
+                } else {
+                    const rsiEl = document.getElementById('sdRsi');
+                    if (rsiEl) {
+                        rsiEl.textContent = ind.rsi ? ind.rsi.toFixed(1) : '—';
+                        const rsiLabel = document.getElementById('sdRsiLabel');
+                        const r = ind.rsi;
+                        rsiLabel.textContent = r < 30 ? 'Oversold' : r > 70 ? 'Overbought' : 'Neutral';
+                        rsiLabel.style.color = r < 30 ? 'var(--green)' : r > 70 ? 'var(--red)' : 'var(--text-2)';
+                    }
+                    if (document.getElementById('sdMacd')) {
+                        document.getElementById('sdMacd').textContent = ind.macd ? ind.macd.toFixed(3) : '—';
+                        document.getElementById('sdMacdLabel').textContent = ind.macd > (ind.macd_signal || 0) ? 'Bullish' : 'Bearish';
+                    }
+                }
+
+                loadSDChart('1mo', '1d', document.querySelector('.tf-btn.active'));
+            } catch (e) { console.error("SD Load Error:", e); }
+        }
+
+        function updateGauge(score) {
+            const needle = document.getElementById('sdGaugeNeedle');
+            const fill = document.getElementById('sdGaugeFill');
+            const text = document.getElementById('sdGaugeText');
+            const scoreLabel = document.getElementById('sdGaugeScore');
+
+            // Map 0-100 to -90 to 90 degrees
+            const degrees = (score / 100) * 180 - 90;
+            needle.style.transform = `translateX(-50%) rotate(${degrees}deg)`;
+            
+            // Map 0-100 to 0 to 0.5 turn
+            fill.style.transform = `rotate(${score / 200}turn)`;
+
+            scoreLabel.textContent = `Score: ${score.toFixed(1)}`;
+            if (score > 70) { text.textContent = 'STRONG BUY'; text.style.color = 'var(--green)'; }
+            else if (score > 55) { text.textContent = 'BUY'; text.style.color = 'var(--green)'; }
+            else if (score < 30) { text.textContent = 'STRONG SELL'; text.style.color = 'var(--red)'; }
+            else if (score < 45) { text.textContent = 'SELL'; text.style.color = 'var(--red)'; }
+            else { text.textContent = 'NEUTRAL'; text.style.color = '#ffd700'; }
+        }
+
+        function update52WRange(low, high, current) {
+            if (!low || !high || !current) return;
+            document.getElementById('sd52wLow').textContent = '₹' + low.toLocaleString('en-IN');
+            document.getElementById('sd52wHigh').textContent = '₹' + high.toLocaleString('en-IN');
+            document.getElementById('sdRangeCurrent').textContent = '₹' + current.toLocaleString('en-IN');
+            
+            const pct = ((current - low) / (high - low)) * 100;
+            const thumb = document.getElementById('sd52wThumb');
+            thumb.style.left = Math.min(Math.max(pct, 0), 100) + '%';
+        }
+
+        async function loadSDChart(period, interval, btn) {
+            if (btn) { document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+            try {
+                const res = await fetch(`/stock/api/history/${SD_SYMBOL}/?period=${period}&interval=${interval}`);
+                const data = await res.json();
+                const candles = data.candles || [];
+                const labels = candles.map(c => c.date.slice(0, 10));
+                const prices = candles.map(c => c.close);
+                
+                const positive = prices.length > 1 && prices[prices.length - 1] >= prices[0];
+                const color = positive ? '#00fa9a' : '#ff3366';
+                
+                const ctx = document.getElementById('sdPriceChart').getContext('2d');
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, positive ? 'rgba(0, 250, 154, 0.2)' : 'rgba(255, 51, 102, 0.2)');
+                gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+                if (sdChartInstance) sdChartInstance.destroy();
+                sdChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels, datasets: [{ data: prices, borderColor: color, borderWidth: 3, pointRadius: 0, fill: true, backgroundColor: gradient, tension: 0.4 }] },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(13, 20, 33, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 } },
+                        scales: { x: { grid: { display: false }, ticks: { color: '#8a97b4', maxTicksLimit: 7 } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a97b4' } } }
+                    }
+                });
+            } catch (e) { console.error("Chart Error:", e); }
+        }
+
+        // Modal Logic
+        function openAddModalDirect() {
+            document.getElementById('sdModalOverlay').style.display = 'block';
+            document.getElementById('sdAddModal').style.display = 'block';
+            document.getElementById('sdHoldingAvg').value = document.getElementById('sdPrice').textContent.replace('₹', '').replace(/,/g, '');
+        }
+        function closeSDModal() {
+            document.getElementById('sdModalOverlay').style.display = 'none';
+            document.getElementById('sdAddModal').style.display = 'none';
+        }
+        async function submitSDHolding() {
+            const qty = parseInt(document.getElementById('sdHoldingQty').value);
+            const avg = parseFloat(document.getElementById('sdHoldingAvg').value);
+            if (!qty || qty <= 0 || !avg || avg <= 0) { alert("Please enter valid quantity and price."); return; }
+            
+            const btn = document.getElementById('sdAddBtn');
+            btn.disabled = true; btn.textContent = 'Adding...';
+
+            try {
+                const r = await fetch('/stock/api/portfolio/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ symbol: SD_SYMBOL, quantity: qty, buy_price: avg })
+                });
+                const d = await r.json();
+                if (d.created) { alert("Stock added successfully!"); closeSDModal(); }
+                else { alert("Error: " + (d.error || "Failed to add")); }
+            } catch (e) { alert("Network error. Try again."); }
+            finally { btn.disabled = false; btn.textContent = 'Add to Portfolio'; }
+        }
+
+        async function addToWatchlistDirect() {
+            try {
+                const r = await fetch('/stock/api/watchlist/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ symbol: SD_SYMBOL }) });
+                const d = await r.json();
+                alert(d.created ? 'Added to watchlist!' : 'Already in watchlist');
+            } catch (e) { alert('Error adding to watchlist'); }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            startClock(); updateMarketStatus(); buildTickerFromCache();
+            loadStockDetail();
+        });
+    </script>
+</body>
+
+</html>
+</body>
+
+</html>

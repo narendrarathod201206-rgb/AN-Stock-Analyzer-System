@@ -1,0 +1,9 @@
+Django>=4.2.0,<6.1
+yfinance>=0.2.30
+djangorestframework
+django-cors-headers
+pandas
+numpy
+django-unfold
+gunicorn
+whitenoise

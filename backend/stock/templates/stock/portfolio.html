@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>StockVision – Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'stock/css/styles.css' %}?v=1.1" />
+    <link rel="stylesheet" href="{% static 'stock/css/advanced.css' %}?v=1.1" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    {% include 'stock/_sidebar.html' with active='portfolio' %}
+    <main class="main-content">
+        {% include 'stock/_topbar.html' %}
+        <div class="ticker-wrapper">
+            <div class="ticker-tape" id="tickerTape"></div>
+        </div>
+        <div class="page-body">
+            <div class="page-header">
+                <h1 class="page-title">My Portfolio</h1>
+                <p class="page-subtitle">Real P&amp;L calculated from live market prices</p>
+            </div>
+
+            <div class="portfolio-kpis" id="portfolioKpis">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Invested</div>
+                    <div class="kpi-value" id="kpiInvested">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Current Value</div>
+                    <div class="kpi-value" id="kpiCurrent">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Total P&amp;L</div>
+                    <div class="kpi-value" id="kpiPnl">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">P&amp;L %</div>
+                    <div class="kpi-value" id="kpiPnlPct">—</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Sector Allocation</h2>
+                    </div>
+                    <div class="pie-wrapper"><canvas id="allocationChart"></canvas></div>
+                    <div class="legend-list" id="allocationLegend"></div>
+                </div>
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Holdings P&amp;L</h2>
+                    </div>
+                    <div style="position:relative;height:280px;"><canvas id="pnlChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="card table-card">
+                <div class="card-header">
+                    <h2 class="card-title">Holdings</h2>
+                    <button class="add-btn" onclick="openAddHolding()">+ Add Holding</button>
+                </div>
+                <div id="portfolioEmpty" class="empty-state" style="display:none;">
+                    <div class="empty-icon">💼</div>
+                    <p>No holdings yet. Add your first stock above.</p>
+                </div>
+                <div class="table-wrapper">
+                    <table class="stock-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Company</th>
+                                <th>Qty</th>
+                                <th>Avg Buy</th>
+                                <th>CMP</th>
+                                <th>Invested</th>
+                                <th>Current Val</th>
+                                <th>P&amp;L</th>
+                                <th>P&amp;L %</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="holdingsBody">
+                            <tr>
+                                <td colspan="10" class="table-loading">Loading portfolio…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
+            
+            <!-- ELITE AI RECOMMENDATIONS SECTION -->
+            <div class="card elite-recs-card" id="eliteRecsContainer">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">💎 Elite AI Portfolio Picks</h2>
+                        <p class="card-subtitle-sm">Smart additions to diversify your current holdings</p>
+                    </div>
+                    <span class="badge-elite">Elite Edition</span>
+                </div>
+                
+                <div id="recsLocked" class="locked-overlay" style="display:none;">
+                    <div class="lock-content">
+                        <div class="lock-icon">🔒</div>
+                        <h3>Unlock AI Optimizations</h3>
+                        <p>Get personalized stock picks to diversify your portfolio based on real-time AI technical signals.</p>
+                        <a href="{% url 'stock:pricing' %}" class="btn-upgrade-sm">Upgrade to Elite</a>
+                    </div>
+                </div>
+
+                <div id="recsLoading" class="recs-loading">
+                    <div class="shimmer-item" style="width:100%; height:80px;"></div>
+                    <div class="shimmer-item" style="width:100%; height:80px;"></div>
+                    <p style="margin-top:10px;">Analyzing market for your next big win...</p>
+                </div>
+
+                <div class="recs-grid" id="recsGrid"></div>
+            </div>
+
+            {% include 'stock/_footer.html' %}
+        </div>
+    </main>
+
+    <!-- ADD HOLDING MODAL -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+    <div class="modal" id="addModal">
+        <div class="modal-header">
+            <h3>Add Holding</h3>
+            <button class="close-btn" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>NSE Symbol</label>
+                <input type="text" id="holdingSymbol" placeholder="e.g. TCS, RELIANCE, INFY"
+                    style="text-transform:uppercase;" />
+            </div>
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" id="holdingQty" placeholder="e.g. 10" min="1" />
+            </div>
+            <div class="form-group">
+                <label>Average Buy Price (₹)</label>
+                <input type="number" id="holdingAvg" placeholder="e.g. 2500" min="1" step="0.01" />
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+            <button class="add-btn" onclick="addHolding()" id="addHoldingBtn">Add to Portfolio</button>
+        </div>
+    </div>
+    <script src="{% static 'stock/js/app.js' %}"></script>
+    <script src="{% static 'stock/js/portfolio.js' %}"></script>
+</body>
+
+</html>

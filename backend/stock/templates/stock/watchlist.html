@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>StockVision – Watchlist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'stock/css/styles.css' %}" />
+    <link rel="stylesheet" href="{% static 'stock/css/advanced.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    {% include 'stock/_sidebar.html' with active='watchlist' %}
+    <main class="main-content">
+        {% include 'stock/_topbar.html' %}
+        <div class="ticker-wrapper">
+            <div class="ticker-tape" id="tickerTape"></div>
+        </div>
+        <div class="page-body">
+            <div class="page-header">
+                <h1 class="page-title">My Watchlist</h1>
+                <p class="page-subtitle">Track your favourite stocks – saved to database</p>
+            </div>
+
+            <div class="add-stock-bar">
+                <input type="text" class="add-stock-input" id="addStockInput"
+                    placeholder="Enter NSE symbol (e.g. TCS, RELIANCE, INFY)…" autocomplete="off" />
+                <button class="add-btn" onclick="addToWatchlist()" id="addWatchBtn">+ Add Stock</button>
+            </div>
+
+            <div id="watchlistEmpty" class="empty-state" style="display:none;">
+                <div class="empty-icon">⭐</div>
+                <p>Your watchlist is empty. Add stocks above to track them here.</p>
+            </div>
+
+            <div class="watchlist-grid" id="watchlistGrid"></div>
+
+            <div class="mini-chart-section card" id="selectedStockSection" style="display:none;">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title" id="selectedStockTitle">Stock Detail</h2>
+                        <div class="chart-meta">
+                            <span class="chart-price" id="selectedStockPrice">—</span>
+                            <span class="chart-change" id="selectedStockChange">—</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <span class="signal-badge" id="selectedSignal"></span>
+                        <button class="close-btn" onclick="closeStockDetail()">✕</button>
+                    </div>
+                </div>
+                <div style="position:relative;height:220px;"><canvas id="watchlistChart"></canvas></div>
+                <div class="stock-detail-grid" id="stockDetailGrid"></div>
+            </div>
+        </div>
+        {% include 'stock/_footer.html' %}
+    </main>
+    <script src="{% static 'stock/js/app.js' %}"></script>
+    <script src="{% static 'stock/js/watchlist.js' %}"></script>
+</body>
+
+</html>

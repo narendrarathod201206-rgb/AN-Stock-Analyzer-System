@@ -1,0 +1,78 @@
+{% load static %}
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <span class="logo-icon">📈</span>
+        <span class="logo-text">StockVision</span>
+    </div>
+
+    <div class="sidebar-nav">
+        <a href="{% url 'stock:dashboard' %}" class="nav-item {% if active == 'dashboard'  %}active{% endif %}">
+            <span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span>
+        </a>
+        <a href="{% url 'stock:watchlist' %}" class="nav-item {% if active == 'watchlist'  %}active{% endif %}">
+            <span class="nav-icon">⭐</span><span class="nav-label">Watchlist</span>
+        </a>
+        <a href="{% url 'stock:portfolio' %}" class="nav-item {% if active == 'portfolio'  %}active{% endif %}">
+            <span class="nav-icon">💼</span><span class="nav-label">Portfolio</span>
+        </a>
+        <a href="{% url 'stock:signals' %}" class="nav-item {% if active == 'signals'    %}active{% endif %}">
+            <span class="nav-icon">🎯</span><span class="nav-label">Signals</span>
+        </a>
+        <a href="{% url 'stock:analytics' %}" class="nav-item {% if active == 'analytics' %}active{% endif %}">
+            <span class="nav-icon">📊</span><span class="nav-label">Analytics</span>
+        </a>
+        <a href="{% url 'stock:screener' %}" class="nav-item {% if active == 'screener'   %}active{% endif %}">
+            <span class="nav-icon">🔍</span><span class="nav-label">Screener</span>
+        </a>
+        <a href="{% url 'stock:news' %}" class="nav-item {% if active == 'news'       %}active{% endif %}">
+            <span class="nav-icon">📰</span><span class="nav-label">News</span>
+        </a>
+
+        <div class="nav-section-label">TOOLS</div>
+        <a href="{% url 'stock:export_portfolio' %}" class="nav-item">
+            <span class="nav-icon">📥</span><span class="nav-label">Export CSV</span>
+        </a>
+        <a href="{% url 'stock:settings' %}" class="nav-item {% if active == 'settings'  %}active{% endif %}">
+            <span class="nav-icon">⚙️</span><span class="nav-label">Settings</span>
+        </a>
+
+        {% if not user.profile.is_premium %}
+        <div class="nav-section-label">PREMIUM</div>
+        <a href="{% url 'stock:pricing' %}" class="nav-item pro-upsell-item {% if active == 'pricing' %}active{% endif %}">
+            <span class="nav-icon">💎</span><span class="nav-label">Go Pro / Elite</span>
+        </a>
+        <style>
+            .pro-upsell-item {
+                background: linear-gradient(45deg, rgba(108, 99, 255, 0.1), rgba(255, 255, 255, 0.05)) !important;
+                border: 1px solid rgba(108, 99, 255, 0.2) !important;
+                margin-top: 10px !important;
+                border-radius: 12px !important;
+            }
+            .pro-upsell-item .nav-icon { color: var(--accent); }
+            .pro-upsell-item:hover { background: var(--accent) !important; color: #fff !important; }
+            .pro-upsell-item:hover .nav-icon { color: #fff; }
+        </style>
+        {% endif %}
+    </div>
+
+    <!-- Market Status Badge -->
+    <div class="sidebar-market-badge" id="sbMarketBadge">
+        <span class="sb-dot" id="sbDot"></span>
+        <span id="sbMarketLabel">Checking…</span>
+    </div>
+
+    <!-- User Section -->
+    <div class="sidebar-user">
+        {% if user.is_authenticated %}
+        <div class="su-avatar">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
+        <div class="su-info">
+            <div class="su-name">{{ user.get_full_name|default:user.username }}</div>
+            <div class="su-plan" style="color: {% if user.profile.is_premium %}var(--accent){% else %}var(--text-2){% endif %}; font-weight: 700;">
+                {{ user.profile.get_plan_display }}
+            </div>
+        </div>
+        <a href="{% url 'stock:logout' %}" class="su-logout" title="Logout">⏻</a>
+        {% endif %}
+    </div>
+</nav>

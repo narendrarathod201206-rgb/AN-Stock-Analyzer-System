@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>StockVision – Market News</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'stock/css/styles.css' %}" />
+    <link rel="stylesheet" href="{% static 'stock/css/advanced.css' %}" />
+</head>
+
+<body>
+    {% include 'stock/_sidebar.html' with active='news' %}
+    <main class="main-content">
+        {% include 'stock/_topbar.html' %}
+        <div class="ticker-wrapper">
+            <div class="ticker-tape" id="tickerTape"></div>
+        </div>
+        <div class="page-body">
+            <div class="page-header">
+                <h1 class="page-title">Market News</h1>
+                <p class="page-subtitle">Latest Indian market news & updates</p>
+            </div>
+
+            <div class="news-filter-bar">
+                <button class="news-filter-btn active" onclick="filterNews('all',this)">All</button>
+                <button class="news-filter-btn" onclick="filterNews('nifty',this)">Indices</button>
+                <button class="news-filter-btn" onclick="filterNews('stock',this)">Stocks</button>
+                <button class="news-filter-btn" onclick="filterNews('economy',this)">Economy</button>
+            </div>
+
+            <div id="newsLoading" class="loading-state">
+                <div class="loading-spinner large"></div>
+                <p>Fetching latest news…</p>
+            </div>
+            <div id="newsEmpty" class="empty-state" style="display:none;">
+                <div class="empty-icon">📰</div>
+                <p>No news available at the moment.</p>
+            </div>
+            <div class="news-grid" id="newsGrid"></div>
+        </div>
+        {% include 'stock/_footer.html' %}
+    </main>
+
+    <script src="{% static 'stock/js/app.js' %}"></script>
+    <script>
+        let allNews = [];
+
+        async function loadNews() {
+            try {
+                const res = await fetch(API_BASE + 'news/');
+                allNews = await res.json();
+                renderNews(allNews);
+            } catch (e) {
+                document.getElementById('newsLoading').style.display = 'none';
+                document.getElementById('newsEmpty').style.display = 'flex';
+            }
+        }
+
+        function renderNews(items) {
+            document.getElementById('newsLoading').style.display = 'none';
+            const grid = document.getElementById('newsGrid');
+            if (!items.length) {
+                document.getElementById('newsEmpty').style.display = 'flex';
+                grid.innerHTML = '';
+                return;
+            }
+            document.getElementById('newsEmpty').style.display = 'none';
+            grid.innerHTML = items.map((n, i) => {
+                const dt = n.published_at ? new Date(n.published_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+                const srcColor = ['#6c63ff', '#00c896', '#ff9f43', '#ff4d6d', '#54a0ff'][i % 5];
+                return `
+    <a class="news-card" href="${n.url || '#'}" target="_blank" rel="noopener">
+      <div class="news-source" style="background:${srcColor}20;color:${srcColor};">${n.source || 'Market News'}</div>
+      <h3 class="news-headline">${n.headline || '—'}</h3>
+      <p class="news-summary">${(n.summary || '').slice(0, 160)}${n.summary && n.summary.length > 160 ? '…' : ''}</p>
+      <div class="news-meta">
+        <span class="news-time">📅 ${dt}</span>
+        <span class="news-read">Read →</span>
+      </div>
+    </a>`;
+            }).join('');
+        }
+
+        function filterNews(cat, btn) {
+            document.querySelectorAll('.news-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (cat === 'all') { renderNews(allNews); return; }
+            const kw = { nifty: ['nifty', 'sensex', 'index', 'market'], stock: ['stock', 'share', 'equity', 'company'], economy: ['gdp', 'rbi', 'rate', 'economy', 'inflation'] };
+            const filtered = allNews.filter(n => {
+                const txt = ((n.headline || '') + (n.summary || '')).toLowerCase();
+                return (kw[cat] || []).some(k => txt.includes(k));
+            });
+            renderNews(filtered.length ? filtered : allNews);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            startClock(); updateMarketStatus(); buildTickerFromCache();
+            loadNews();
+        });
+    </script>
+</body>
+
+</html>

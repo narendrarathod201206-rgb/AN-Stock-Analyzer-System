@@ -1,0 +1,245 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockVision – Join the Elite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'stock/css/styles.css' %}" />
+    <link rel="stylesheet" href="{% static 'stock/css/auth.css' %}" />
+</head>
+
+<body class="auth-body">
+
+    <div class="auth-bg">
+        <div class="auth-orb orb1"></div>
+        <div class="auth-orb orb2"></div>
+        <div class="auth-orb orb3"></div>
+        <div class="auth-particles" id="particles"></div>
+    </div>
+
+    <div class="auth-ticker-bar">
+        <span class="auth-ticker-item"><span class="at-sym">NIFTY 50</span> <span class="at-val up">↑ 22,541
+                +0.82%</span></span>
+        <span class="auth-ticker-item"><span class="at-sym">SENSEX</span> <span class="at-val up">↑ 74,230
+                +0.74%</span></span>
+        <span class="auth-ticker-item"><span class="at-sym">BANK NIFTY</span> <span class="at-val up">↑ 47,880
+                +0.61%</span></span>
+        <span class="auth-ticker-item"><span class="at-sym">HDFCBANK</span> <span class="at-val down">↓ ₹1,710
+                -0.4%</span></span>
+        <span class="auth-ticker-item"><span class="at-sym">ICICIBANK</span> <span class="at-val up">↑ ₹1,150
+                +0.9%</span></span>
+    </div>
+
+    <div class="auth-layout">
+
+        <!-- LEFT HERO -->
+        <div class="auth-hero">
+            <div class="auth-hero-content">
+                <div class="auth-logo">
+                    <div class="auth-logo-icon">📈</div>
+                    <div class="auth-logo-text">StockVision</div>
+                    <div class="auth-logo-badge">PRO</div>
+                </div>
+                <h1 class="auth-hero-title">Start Your Journey<br />to Smarter Investing</h1>
+                <p class="auth-hero-sub">Join thousands of traders using real-time NSE data & AI signals</p>
+
+                <div class="auth-plan-cards">
+                    <div class="auth-plan active-plan">
+                        <div class="plan-badge">✓ FREE PLAN</div>
+                        <div class="plan-name">Starter</div>
+                        <div class="plan-price">₹0 <span>/mo</span></div>
+                        <ul class="plan-perks">
+                            <li>✅ 30+ NSE stocks</li>
+                            <li>✅ Live quotes</li>
+                            <li>✅ Basic charts</li>
+                            <li>✅ Watchlist (up to 10)</li>
+                        </ul>
+                    </div>
+                    <div class="auth-plan pro-plan">
+                        <div class="plan-badge">🔥 PRO PLAN</div>
+                        <div class="plan-name">Pro Trader</div>
+                        <div class="plan-price">₹299 <span>/mo</span></div>
+                        <ul class="plan-perks">
+                            <li>✅ Everything in Starter</li>
+                            <li>✅ Technical indicators</li>
+                            <li>✅ AI BUY/SELL signals</li>
+                            <li>✅ Unlimited watchlist</li>
+                            <li>✅ Portfolio analytics</li>
+                            <li>✅ Price alerts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT FORM -->
+        <div class="auth-form-panel">
+            <div class="auth-card">
+                <div class="auth-card-header">
+                    <div class="auth-brand-mini">📈 StockVision</div>
+                    <h2 class="auth-card-title">Create your account</h2>
+                    <p class="auth-card-sub">Free forever · No credit card required</p>
+                </div>
+
+                {% if messages %}
+                <div class="auth-messages">
+                    {% for msg in messages %}
+                    <div class="auth-msg {{ msg.tags }}">
+                        {% if 'error' in msg.tags %}⚠️{% else %}✅{% endif %}
+                        {{ msg }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form class="auth-form" method="POST" action="" id="registerForm">
+                    {% csrf_token %}
+
+                    <div class="auth-field-row">
+                        <div class="auth-field">
+                            <label class="auth-label">Full Name</label>
+                            <div class="auth-input-wrap">
+                                <span class="auth-input-icon">✏️</span>
+                                <input type="text" name="full_name" class="auth-input" placeholder="Narendra Rathod"
+                                    autocomplete="name" />
+                            </div>
+                        </div>
+                        <div class="auth-field">
+                            <label class="auth-label">Username <span class="required">*</span></label>
+                            <div class="auth-input-wrap">
+                                <span class="auth-input-icon">@</span>
+                                <input type="text" name="username" class="auth-input" placeholder="narendra123" required
+                                    autocomplete="username" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="auth-field">
+                        <label class="auth-label">Email Address</label>
+                        <div class="auth-input-wrap">
+                            <span class="auth-input-icon">📧</span>
+                            <input type="email" name="email" class="auth-input" placeholder="narendra@example.com"
+                                autocomplete="email" />
+                        </div>
+                    </div>
+
+                    <div class="auth-field-row">
+                        <div class="auth-field">
+                            <label class="auth-label">Password <span class="required">*</span></label>
+                            <div class="auth-input-wrap">
+                                <span class="auth-input-icon">🔒</span>
+                                <input type="password" name="password1" id="regPass1" class="auth-input"
+                                    placeholder="Min 6 characters" required />
+                                <button type="button" class="auth-pass-toggle"
+                                    onclick="togglePass('regPass1',this)">👁</button>
+                            </div>
+                        </div>
+                        <div class="auth-field">
+                            <label class="auth-label">Confirm Password <span class="required">*</span></label>
+                            <div class="auth-input-wrap">
+                                <span class="auth-input-icon">🔑</span>
+                                <input type="password" name="password2" id="regPass2" class="auth-input"
+                                    placeholder="Repeat password" required oninput="checkMatch()" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password strength -->
+                    <div class="pass-strength-bar" id="passStrengthBar">
+                        <div class="psb-fill" id="psbFill"></div>
+                    </div>
+                    <div class="pass-strength-label" id="passStrengthLabel"></div>
+
+                    <div id="matchError" class="auth-inline-err" style="display:none;">⚠️ Passwords don't match</div>
+
+                    <label class="auth-terms">
+                        <input type="checkbox" name="agree" required />
+                        I agree to the <a href="#" class="auth-link">Terms of Service</a> and <a href="#" class="auth-link">Privacy Policy</a>
+                    </label>
+
+                    <button type="submit" class="auth-submit-btn">
+                        <span class="auth-btn-text">Create Free Account →</span>
+                    </button>
+                </form>
+
+                <div class="auth-divider"><span>or</span></div>
+
+                <div class="auth-switch">
+                    Already have an account?
+                    <a href="{% url 'stock:login' %}" class="auth-link">Sign in →</a>
+                </div>
+            </div>
+
+            <div class="auth-stats-bar">
+                <div class="auth-stat">
+                    <div class="as-val">🔒</div>
+                    <div class="as-label">Secure</div>
+                </div>
+                <div class="auth-stat">
+                    <div class="as-val">⚡</div>
+                    <div class="as-label">Instant</div>
+                </div>
+                <div class="auth-stat">
+                    <div class="as-val">📊</div>
+                    <div class="as-label">Real-time</div>
+                </div>
+                <div class="auth-stat">
+                    <div class="as-val">🤖</div>
+                    <div class="as-label">AI Signals</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Particles
+        const canvas = document.getElementById('particles');
+        for (let i = 0; i < 40; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const s = Math.random() * 4 + 1;
+            p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random() * 100}%;top:${Math.random() * 100}%;animation-delay:${Math.random() * 6}s;animation-duration:${8 + Math.random() * 10}s;opacity:${Math.random() * 0.4 + 0.1};`;
+            canvas.appendChild(p);
+        }
+
+        function togglePass(id, btn) {
+            const inp = document.getElementById(id);
+            const show = inp.type === 'password';
+            inp.type = show ? 'text' : 'password';
+            btn.textContent = show ? '🙈' : '👁';
+        }
+
+        function checkMatch() {
+            const p1 = document.getElementById('regPass1').value;
+            const p2 = document.getElementById('regPass2').value;
+            const err = document.getElementById('matchError');
+            err.style.display = p2 && p1 !== p2 ? 'block' : 'none';
+        }
+
+        // Password strength
+        document.getElementById('regPass1').addEventListener('input', function () {
+            const v = this.value;
+            const fill = document.getElementById('psbFill');
+            const lbl = document.getElementById('passStrengthLabel');
+            let score = 0;
+            if (v.length >= 6) score++;
+            if (v.length >= 10) score++;
+            if (/[A-Z]/.test(v)) score++;
+            if (/[0-9]/.test(v)) score++;
+            if (/[^A-Za-z0-9]/.test(v)) score++;
+            const labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+            const colors = ['', '#ff4d6d', '#ff9f43', '#ffc542', '#00c896', '#6c63ff'];
+            fill.style.width = (score * 20) + '%';
+            fill.style.background = colors[score] || '#ff4d6d';
+            lbl.textContent = labels[score] || '';
+            lbl.style.color = colors[score] || '#ff4d6d';
+        });
+    </script>
+</body>
+
+</html>

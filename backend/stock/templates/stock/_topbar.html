@@ -1,0 +1,31 @@
+{% load static %}
+<!-- TOPBAR -->
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="ticker-wrap"><div id="tickerTape" class="ticker-tape"></div></div>
+<header class="topbar">
+    <div class="topbar-left">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search NSE stocks… e.g. TCS, RELIANCE"
+                autocomplete="off" />
+            <div class="search-dropdown" id="searchDropdown"></div>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <div class="market-status">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="marketStatusLabel">Market</span>
+        </div>
+        <span class="topbar-time" id="liveTime">--:--:--</span>
+        <a href="{% url 'stock:news' %}" class="notif-btn" title="News">📰</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'stock:settings' %}" class="user-topbar-btn" title="Settings">
+            <div class="topbar-avatar">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
+        </a>
+        {% endif %}
+    </div>
+</header>
+
+<!-- Toast container -->
+<!-- Auto-Logout script removed per user request for manual-only logout -->

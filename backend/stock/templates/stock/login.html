@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockVision – Sign In</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'stock/css/styles.css' %}" />
+    <link rel="stylesheet" href="{% static 'stock/css/auth.css' %}" />
+</head>
+
+<body class="auth-body">
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <!-- Animated background -->
+    <div class="auth-bg">
+        <div class="auth-orb orb1"></div>
+        <div class="auth-orb orb2"></div>
+        <div class="auth-orb orb3"></div>
+        <div class="auth-particles" id="particles"></div>
+    </div>
+
+    <!-- Live mini-ticker at top -->
+    <div class="auth-ticker-bar">
+        <span class="auth-ticker-item"><span class="at-sym">NIFTY 50</span> <span class="at-val up">↑ 22,541
+                +0.82%</span></span>
+        <span class="auth-ticker-item"><span class="at-sym">SENSEX</span> <span class="at-val up">↑ 74,230
+                +0.74%</span></span>
+        <span class="auth-ticker-item"><span class="at-sym">BANK NIFTY</span> <span class="at-val up">↑ 47,880
+                +0.61%</span></span>
+        <span class="auth-ticker-item"><span class="at-sym">RELIANCE</span> <span class="at-val up">↑ ₹2,840
+                +1.2%</span></span>
+        <span class="auth-ticker-item"><span class="at-sym">TCS</span> <span class="at-val down">↓ ₹3,920
+                -0.3%</span></span>
+        <span class="auth-ticker-item"><span class="at-sym">INFY</span> <span class="at-val up">↑ ₹1,640
+                +0.8%</span></span>
+    </div>
+
+    <div class="auth-layout">
+
+        <!-- LEFT HERO PANEL -->
+        <div class="auth-hero">
+            <div class="auth-hero-content">
+                <div class="auth-logo">
+                    <div class="auth-logo-icon">📈</div>
+                    <div class="auth-logo-text">StockVision</div>
+                    <div class="auth-logo-badge">PRO</div>
+                </div>
+                <h1 class="auth-hero-title">India's Most Advanced<br />Stock Analytics Platform</h1>
+                <p class="auth-hero-sub">Real-time NSE/BSE data · Technical indicators · AI signals</p>
+
+                <div class="auth-feature-list">
+                    <div class="auth-feature"><span class="af-icon">🔴</span><span>Live NIFTY · SENSEX · BANK NIFTY
+                            feeds</span></div>
+                    <div class="auth-feature"><span class="af-icon">📊</span><span>RSI · MACD · Bollinger Bands · SMA
+                            charts</span></div>
+                    <div class="auth-feature"><span class="af-icon">🤖</span><span>AI-powered BUY / SELL / HOLD
+                            signals</span></div>
+                    <div class="auth-feature"><span class="af-icon">💼</span><span>Portfolio tracker with real
+                            P&amp;L</span></div>
+                    <div class="auth-feature"><span class="af-icon">🔔</span><span>Price alerts &amp; screener
+                            tools</span></div>
+                    <div class="auth-feature"><span class="af-icon">📰</span><span>Latest market news aggregated</span>
+                    </div>
+                </div>
+
+                <!-- mini chart decorative -->
+                <div class="auth-mini-chart">
+                    <svg viewBox="0 0 280 80" preserveAspectRatio="none" class="auth-svg">
+                        <defs>
+                            <linearGradient id="gUp" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#00c896" stop-opacity="0.35" />
+                                <stop offset="100%" stop-color="#00c896" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <path
+                            d="M0,70 L20,62 L40,55 L60,58 L80,45 L100,40 L120,35 L140,30 L160,20 L180,22 L200,14 L220,10 L240,8 L260,5 L280,3"
+                            fill="none" stroke="#00c896" stroke-width="2" stroke-linejoin="round" />
+                        <path
+                            d="M0,70 L20,62 L40,55 L60,58 L80,45 L100,40 L120,35 L140,30 L160,20 L180,22 L200,14 L220,10 L240,8 L260,5 L280,3 L280,80 L0,80Z"
+                            fill="url(#gUp)" />
+                    </svg>
+                    <div class="auth-chart-label">NIFTY 50 · 1 Year · +18.4%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT FORM PANEL -->
+        <div class="auth-form-panel">
+            <div class="auth-card">
+                <div class="auth-card-header">
+                    <div class="auth-brand-mini">📈 StockVision</div>
+                    <h2 class="auth-card-title">Welcome back</h2>
+                    <p class="auth-card-sub">Sign in to your trading account</p>
+                </div>
+
+                <!-- Messages -->
+                {% if messages %}
+                <div class="auth-messages">
+                    {% for msg in messages %}
+                    <div class="auth-msg {{ msg.tags }}">
+                        {% if 'error' in msg.tags %}⚠️{% else %}✅{% endif %}
+                        {{ msg }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form class="auth-form" method="POST" action="">
+                    {% csrf_token %}
+
+                    <div class="auth-field">
+                        <label class="auth-label">Username</label>
+                        <div class="auth-input-wrap">
+                            <span class="auth-input-icon">👤</span>
+                            <input type="text" name="username" class="auth-input" placeholder="Enter your username"
+                                autocomplete="username" required />
+                        </div>
+                    </div>
+
+                    <div class="auth-field">
+                        <label class="auth-label">Password</label>
+                        <div class="auth-input-wrap">
+                            <span class="auth-input-icon">🔒</span>
+                            <input type="password" name="password" id="loginPass" class="auth-input"
+                                placeholder="Enter your password" autocomplete="current-password" required />
+                            <button type="button" class="auth-pass-toggle"
+                                onclick="togglePass('loginPass',this)">👁</button>
+                        </div>
+                    </div>
+
+                    <div class="auth-options">
+                        <label class="auth-remember">
+                            <input type="checkbox" name="remember" /> Remember me
+                        </label>
+                        <a href="{% url 'stock:password_reset' %}" class="auth-forgot">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn">
+                        <span class="auth-btn-text">Sign In to StockVision</span>
+                        <span class="auth-btn-icon">→</span>
+                    </button>
+                </form>
+
+                <div class="auth-divider"><span>or</span></div>
+
+                <div class="auth-switch">
+                    Don't have an account?
+                    <a href="{% url 'stock:register' %}" class="auth-link">Create one free →</a>
+                </div>
+            </div>
+
+            <!-- Stats bar below card -->
+            <div class="auth-stats-bar">
+                <div class="auth-stat">
+                    <div class="as-val">30+</div>
+                    <div class="as-label">NSE Stocks</div>
+                </div>
+                <div class="auth-stat">
+                    <div class="as-val">Live</div>
+                    <div class="as-label">Market Data</div>
+                </div>
+                <div class="auth-stat">
+                    <div class="as-val">6</div>
+                    <div class="as-label">Indicators</div>
+                </div>
+                <div class="auth-stat">
+                    <div class="as-val">AI</div>
+                    <div class="as-label">Signals</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animated floating particles
+        const canvas = document.getElementById('particles');
+        const PARTICLE_COUNT = 40;
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 4 + 1;
+            p.style.cssText = `
+    width:${size}px;height:${size}px;
+    left:${Math.random() * 100}%;
+    top:${Math.random() * 100}%;
+    animation-delay:${Math.random() * 6}s;
+    animation-duration:${8 + Math.random() * 10}s;
+    opacity:${Math.random() * 0.4 + 0.1};
+  `;
+            canvas.appendChild(p);
+        }
+
+        function togglePass(id, btn) {
+            const inp = document.getElementById(id);
+            const show = inp.type === 'password';
+            inp.type = show ? 'text' : 'password';
+            btn.textContent = show ? '🙈' : '👁';
+        }
+    </script>
+</body>
+
+</html>

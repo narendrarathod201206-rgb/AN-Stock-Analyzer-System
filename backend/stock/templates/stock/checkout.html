@@ -1,0 +1,313 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout – StockVision</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'stock/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'stock/css/advanced.css' %}">
+    <style>
+        .checkout-container {
+            width: 95%;
+            max-width: 550px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            backdrop-filter: blur(20px);
+            text-align: center;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .checkout-container { 
+                padding: 20px; 
+                border-radius: 24px; 
+                margin: 20px auto; 
+                width: 98%; /* More space on small screens */
+            }
+            .duration-grid { gap: 8px; }
+            .duration-opt { padding: 10px 4px; }
+            .total-box { font-size: 2rem; }
+            .checkout-header h1 { font-size: 1.6rem; }
+            .upi-badge { padding: 15px; }
+            .qr-wrapper { width: 160px; height: 160px; }
+        }
+        .checkout-header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #6c63ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .plan-summary {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            text-align: left;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .summary-title {
+            color: var(--text-2);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+        .summary-val {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+        }
+        .duration-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .duration-opt {
+            padding: 12px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .duration-opt:hover {
+            border-color: rgba(108, 99, 255, 0.4);
+            background: rgba(108, 99, 255, 0.05);
+        }
+        .duration-opt.active {
+            border-color: var(--accent);
+            background: rgba(108, 99, 255, 0.15);
+            box-shadow: 0 0 15px rgba(108, 99, 255, 0.2);
+            transform: scale(1.05);
+        }
+        .duration-opt .months {
+            font-weight: 800;
+            display: block;
+            font-size: 1rem;
+            color: #fff;
+        }
+        .duration-opt .discount {
+            font-size: 0.7rem;
+            color: var(--neon-green);
+            margin-top: 4px;
+            display: block;
+            font-weight: 700;
+        }
+        .total-box {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 25px;
+            text-shadow: 0 0 20px rgba(108, 99, 255, 0.3);
+        }
+        .btn-pay {
+            width: 100%;
+            padding: 18px;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent), #4e44e7);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(108, 99, 255, 0.4);
+        }
+        .btn-pay:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(108, 99, 255, 0.5);
+            filter: brightness(1.1);
+        }
+        .success-state {
+            display: none;
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* UPI Section */
+        .upi-badge {
+            background: rgba(108, 99, 255, 0.08);
+            padding: 25px;
+            border-radius: 24px;
+            border: 1px dashed rgba(108, 99, 255, 0.4);
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .upi-id-box {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 12px 0;
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 12px;
+            display: inline-block;
+            word-break: break-all;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .qr-wrapper {
+            width: 200px;
+            height: 200px;
+            background: #fff;
+            margin: 20px auto;
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qr-wrapper img {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .txn-input {
+            width: 100%; 
+            padding: 18px; 
+            border-radius: 16px; 
+            border: 1px solid var(--glass-border); 
+            background: rgba(0,0,0,0.3); 
+            color: #fff; 
+            margin-bottom: 25px; 
+            text-align: center; 
+            font-family: 'Courier New', monospace; 
+            font-size: 1.2rem; 
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .txn-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(108, 99, 255, 0.05);
+            box-shadow: 0 0 15px rgba(108, 99, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    {% include 'stock/_sidebar.html' %}
+
+    <main class="main-content">
+        {% include 'stock/_topbar.html' %}
+        <div class="checkout-container" id="checkoutFlow">
+            <div class="checkout-header">
+                <a href="{% url 'stock:pricing' %}" style="display: block; color: var(--text-2); font-size: 0.85rem; margin-bottom: 10px; text-decoration: none; transition: 0.2s;">
+                    ← Back to Plans
+                </a>
+                <h1>Secure Checkout</h1>
+            </div>
+
+            <div class="plan-summary">
+                <div class="summary-title">Selected Plan</div>
+                <div class="summary-val">{{ plan_name }} Edition</div>
+            </div>
+
+            <div class="summary-title">Plan Duration</div>
+            <div class="summary-val" style="margin-bottom: 25px; font-size: 1.1rem; color: var(--accent);">
+                {% if plan_key == 'pro' %}6 Months{% else %}1 Year{% endif %}
+            </div>
+
+            <div class="summary-title">Order Total</div>
+            <div class="total-box">₹<span id="totalVal">{{ price_month }}</span></div>
+
+            <!-- UPI Payment Section -->
+            <div class="upi-badge">
+                <div class="summary-title" style="color: var(--accent);">Pay via UPI</div>
+                <div class="upi-id-box" id="upiId">narendra.rathod201206-1@okicici</div>
+                
+                <div class="qr-wrapper">
+                    <!-- Real UPI QR Code using API -->
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=narendra.rathod201206-1@okicici%26pn=STOCKVISION%26cu=INR" alt="UPI QR Code">
+                </div>
+                
+                <p style="font-size: 0.85rem; color: var(--text-2); line-height: 1.5; padding: 0 10px;">
+                    Scan QR with <strong>GPay, PhonePe, or Paytm</strong>.<br>
+                    Make payment and enter the <strong>12-digit Ref No.</strong> below.
+                </p>
+            </div>
+
+            <div class="summary-title">Transaction ID / UTR No.</div>
+            <input type="text" id="txnId" class="txn-input" placeholder="Enter Reference ID">
+
+            <button class="btn-pay" onclick="mockPay(event)">Confirm & Submit Proof</button>
+            <p style="color: var(--text-2); font-size: 0.8rem; margin-top: 20px; opacity: 0.8;">
+                🔒 Admin checks usually take 1-2 hours.
+            </p>
+        </div>
+
+        <div class="checkout-container success-state" id="successFlow">
+            <div style="font-size: 5rem; margin-bottom: 20px;">📜</div>
+            <h1 style="color: #fff; font-size: 2.2rem; margin-bottom: 15px;">Proof Received!</h1>
+            <p style="color: var(--text-2); margin-bottom: 35px; line-height: 1.6;">
+                Your payment proof has been submitted to the Admin for verification.<br>
+                Plan: <strong>{{ plan_name }} Edition</strong><br>
+                Please wait while we activate your premium status.
+            </p>
+            <a href="{% url 'stock:dashboard' %}" class="btn-pay" style="display: block; text-decoration: none;">Return to Dashboard</a>
+        </div>
+        {% include 'stock/_footer.html' %}
+    </main>
+    
+    <script>
+        const planKey = "{{ plan_key }}";
+        let currentDuration = (planKey === 'pro') ? 6 : 12;
+        let currentTotal = {{ price_month }};
+
+        // Initialize QR code with fixed amount
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=narendra.rathod201206-1@okicici%26pn=STOCKVISION%26cu=INR%26am=${currentTotal}`;
+        document.querySelector('.qr-wrapper img').src = qrUrl;
+
+        function selectDuration(e, months) {
+            // No longer used, but kept for compatibility.
+        }
+
+        async function mockPay(e) {
+            const txnId = document.getElementById('txnId').value.trim();
+            if (!txnId) {
+                alert("Bhai, Transaction ID toh daal do!");
+                return;
+            }
+
+            const btn = e.currentTarget;
+            btn.textContent = "Verifying Proof...";
+            btn.disabled = true;
+
+            try {
+                const resp = await fetch("{% url 'stock:api_subscribe' %}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        plan: planKey,
+                        duration: currentDuration,
+                        amount: currentTotal,
+                        transaction_id: txnId
+                    })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    document.getElementById('checkoutFlow').style.display = 'none';
+                    document.getElementById('successFlow').style.display = 'block';
+                } else {
+                    alert("Error: " + data.error);
+                    btn.textContent = "Confirm & Submit Proof";
+                    btn.disabled = false;
+                }
+            } catch(e) {
+                alert("Submission failed. Network issues likely.");
+                btn.textContent = "Confirm & Submit Proof";
+                btn.disabled = false;
+            }
+        }
+    </script>
+    <script src="{% static 'stock/js/app.js' %}"></script>
+</body>
+</html>
