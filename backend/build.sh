@@ -8,5 +8,8 @@ pip install -r requirements.txt
 # Run migrations
 python manage.py migrate
 
+# Create Superuser (One-time or Update)
+python create_super.py
+
 # Collect static files
 python manage.py collectstatic --no-input
