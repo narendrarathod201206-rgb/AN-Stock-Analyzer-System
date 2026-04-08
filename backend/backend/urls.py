@@ -17,9 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
+from django.conf import settings
+
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+
+def debug_users(request):
+    users = list(User.objects.values('username', 'is_staff', 'is_superuser'))
+    return JsonResponse({'users': users, 'db_path': settings.DATABASES['default']['NAME']})
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('debug-db/', debug_users),
     path('stock/', include('stock.urls', namespace='stock')),
     path('', lambda request: redirect('stock:login' if not request.user.is_authenticated else 'stock:dashboard'), name='home'),
 ]
