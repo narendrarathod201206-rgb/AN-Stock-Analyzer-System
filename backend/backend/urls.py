@@ -24,7 +24,8 @@ from django.http import JsonResponse
 
 def debug_users(request):
     users = list(User.objects.values('username', 'is_staff', 'is_superuser'))
-    return JsonResponse({'users': users, 'db_path': settings.DATABASES['default']['NAME']})
+    db_name = str(settings.DATABASES['default']['NAME'])
+    return JsonResponse({'users': users, 'db_path': db_name})
 
 urlpatterns = [
     path('admin/', admin.site.urls),
