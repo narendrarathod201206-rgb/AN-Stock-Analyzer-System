@@ -348,7 +348,6 @@ def register_view(request):
                 user.first_name = parts[0]
                 user.last_name  = parts[1] if len(parts) > 1 else ''
                 user.save()
-            UserProfile.objects.create(user=user)
             login(request, user)
             messages.success(request, f'Welcome to StockVision, {user.first_name or username}! 🎉')
             return redirect('stock:dashboard')
