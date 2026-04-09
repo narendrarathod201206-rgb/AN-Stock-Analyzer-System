@@ -272,7 +272,12 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
+            # Safety check: Ensure profile exists even if signal was skipped (e.g. legacy users)
+            UserProfile.objects.get_or_create(user=user)
+            
             next_url = request.GET.get('next', '')
+            if next_url and not next_url.startswith('/'): # Prevent open redirect
+                next_url = ''
             return redirect(next_url if next_url else 'stock:dashboard')
         else:
             messages.error(request, 'Invalid username or password. Please try again.')
