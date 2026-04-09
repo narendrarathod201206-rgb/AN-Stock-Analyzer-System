@@ -144,7 +144,15 @@ def _get_quote(symbol):
         return data
     except Exception as e:
         logger.warning(f"Quote error for {symbol}: {e}")
-        return None
+        # Return a absolute fallback card so the UI doesn't show "undefined"
+        return {
+            "symbol": symbol,
+            "name": NSE_STOCKS.get(symbol, {}).get("name", symbol),
+            "price": 0,
+            "change": 0,
+            "pct_change": 0,
+            "error": True
+        }
 
 
 def _s(v):

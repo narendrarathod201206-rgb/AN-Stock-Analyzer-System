@@ -187,10 +187,11 @@ async function buildIndexCards() {
         const r = await fetch(API_BASE + 'market/');
         const data = await r.json();
         container.innerHTML = data.map(d => {
+            if (d.error) return ''; // Skip failed indices
             const pos = d.pct_change >= 0;
             const sign = pos ? '+' : '';
             return `<div class="index-card ${pos ? 'up' : 'down'}" onclick="window.location='/stock/analytics/?sym=${d.key}'">
-        <div class="index-name">${d.name}</div>
+        <div class="index-name">${d.name || d.key}</div>
         <div class="index-value">${fmt(d.price)}</div>
         <div class="index-change ${pos ? 'positive' : 'negative'}">${sign}${fmt(d.change)} (${sign}${fmt(d.pct_change)}%)</div>
         <canvas class="index-mini-chart" id="mini_${d.key}"></canvas>
@@ -345,14 +346,15 @@ function buildMovers(type) {
     if (!list) return;
     const items = moversData[type] || [];
     list.innerHTML = items.map(d => {
+        if (!d || d.error) return '';
         const pos = d.pct_change >= 0;
         const sign = pos ? '+' : '';
         return `<div class="mover-item" onclick="window.location='/stock/stock/${d.symbol}/'">
       <div class="mover-left">
-        <div class="mover-sym-badge">${d.symbol.slice(0, 3)}</div>
+        <div class="mover-sym-badge">${(d.symbol || '').slice(0, 3)}</div>
         <div>
-          <div class="mover-symbol">${d.symbol}</div>
-          <div class="mover-name">${d.name}</div>
+          <div class="mover-symbol">${d.symbol || 'N/A'}</div>
+          <div class="mover-name">${d.name || 'Stock'}</div>
         </div>
       </div>
       <div class="mover-right">
@@ -443,16 +445,16 @@ async function buildTable() {
             return await r.json();
         } catch (e) { return null; }
     }));
-    tbody.innerHTML = rows.filter(Boolean).map(q => {
+    tbody.innerHTML = rows.filter(r => r && !r.error).map(q => {
         const pos = q.pct_change >= 0;
         const sign = pos ? '+' : '';
         return `<tr onclick="window.location='/stock/stock/${q.symbol}/'" style="cursor:pointer;">
       <td><span class="sym-badge">${q.symbol}</span></td>
-      <td>${q.name}</td>
+      <td>${q.name || q.symbol}</td>
       <td><strong>${fmtCurr(q.price)}</strong></td>
       <td class="${pos ? 'positive' : 'negative'}">${sign}${fmt(q.change)}</td>
       <td class="${pos ? 'positive' : 'negative'}">${sign}${fmt(q.pct_change)}%</td>
-      <td>${q.volume?.toLocaleString('en-IN') || '—'}</td>
+      <td>${(q.volume || 0).toLocaleString('en-IN')}</td>
       <td>${fmtCr(q.market_cap)}</td>
       <td>${fmtCurr(q.week52_high)}</td>
       <td><a href="/stock/stock/${q.symbol}/" class="action-btn">View</a></td>
