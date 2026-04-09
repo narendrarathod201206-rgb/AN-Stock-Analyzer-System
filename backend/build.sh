@@ -9,6 +9,7 @@ pip install -r requirements.txt
 python manage.py migrate
 
 # Create Superuser (One-time or Update)
+# This ensures visionadmin / vision12345 always exists
 python create_super.py
 
 # Collect static files
