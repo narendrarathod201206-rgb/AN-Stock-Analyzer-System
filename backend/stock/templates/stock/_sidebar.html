@@ -37,7 +37,7 @@
             <span class="nav-icon">⚙️</span><span class="nav-label">Settings</span>
         </a>
 
-        {% if not user.profile.is_premium %}
+        {% if not sub_info.is_premium %}
         <div class="nav-section-label">PREMIUM</div>
         <a href="{% url 'stock:pricing' %}" class="nav-item pro-upsell-item {% if active == 'pricing' %}active{% endif %}">
             <span class="nav-icon">💎</span><span class="nav-label">Go Pro / Elite</span>
@@ -68,8 +68,8 @@
         <div class="su-avatar">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
         <div class="su-info">
             <div class="su-name">{{ user.get_full_name|default:user.username }}</div>
-            <div class="su-plan" style="color: {% if user.profile.is_premium %}var(--accent){% else %}var(--text-2){% endif %}; font-weight: 700;">
-                {{ user.profile.get_plan_display }}
+            <div class="su-plan" style="color: {% if sub_info.is_premium %}var(--accent){% else %}var(--text-2){% endif %}; font-weight: 700;">
+                {{ sub_info.plan }}
             </div>
         </div>
         <a href="{% url 'stock:logout' %}" class="su-logout" title="Logout">⏻</a>
